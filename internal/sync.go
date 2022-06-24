@@ -106,6 +106,7 @@ func (s *syncGSuite) SyncUsers(queries []string) error {
 		}
 	}
 
+	knownGoogleUsers := map[string]bool{}
 	googleUsers := []*admin.User{}
 	log.Debug("get active google users")
 	for _, query := range queries {
@@ -113,7 +114,14 @@ func (s *syncGSuite) SyncUsers(queries []string) error {
 		if err != nil {
 			return err
 		}
-		googleUsers = append(googleUsers, users...)
+		for _, user := range users {
+			if _, ok := knownGoogleUsers[user.Id]; ok {
+				// This entry already exists
+				continue
+			}
+			googleUsers = append(googleUsers, user)
+			knownGoogleUsers[user.Id] = true
+		}
 	}
 
 	for _, u := range googleUsers {
@@ -178,6 +186,7 @@ func (s *syncGSuite) SyncGroups(queries []string) error {
 		queries = append(queries, "")
 	}
 
+	knownGoogleGroups := map[string]bool{}
 	googleGroups := []*admin.Group{}
 	for _, query := range queries {
 		log.WithField("query", query).Debug("get google groups")
@@ -188,7 +197,14 @@ func (s *syncGSuite) SyncGroups(queries []string) error {
 		if len(groups) < 1 {
 			log.WithField("query", query).Debug("query provided no group results")
 		}
-		googleGroups = append(googleGroups, groups...)
+		for _, group := range groups {
+			if _, ok := knownGoogleGroups[group.Id]; ok {
+				// This entry already exists
+				continue
+			}
+			googleGroups = append(googleGroups, group)
+			knownGoogleGroups[group.Id] = true
+		}
 	}
 
 	correlatedGroups := make(map[string]*aws.Group)
@@ -293,6 +309,7 @@ func (s *syncGSuite) SyncGroupsUsers(queries []string) error {
 		queries = append(queries, "")
 	}
 
+	knownGoogleGroups := map[string]bool{}
 	googleGroups := []*admin.Group{}
 	for _, query := range queries {
 		log.WithField("query", query).Info("get google groups")
@@ -310,7 +327,12 @@ func (s *syncGSuite) SyncGroupsUsers(queries []string) error {
 				log.WithField("group", g.Email).Debug("ignoring group")
 				continue
 			}
+			if _, ok := knownGoogleGroups[g.Id]; ok {
+				// This entry already exists
+				continue
+			}
 			googleGroups = append(googleGroups, g)
+			knownGoogleGroups[g.Id] = true
 		}
 	}
 
