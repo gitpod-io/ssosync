@@ -58,13 +58,14 @@ func New(cfg *config.Config, a aws.Client, g google.Client) SyncGSuite {
 // References:
 // * https://developers.google.com/admin-sdk/directory/v1/guides/search-users
 // query possible values:
-// '' --> empty or not defined
-//  name:'Jane'
-//  email:admin*
-//  isAdmin=true
-//  manager='janesmith@example.com'
-//  orgName=Engineering orgTitle:Manager
-//  EmploymentData.projects:'GeneGnomes'
+// ” --> empty or not defined
+//
+//	name:'Jane'
+//	email:admin*
+//	isAdmin=true
+//	manager='janesmith@example.com'
+//	orgName=Engineering orgTitle:Manager
+//	EmploymentData.projects:'GeneGnomes'
 func (s *syncGSuite) SyncUsers(queries []string) error {
 	if len(queries) < 1 {
 		queries = append(queries, "")
@@ -173,13 +174,14 @@ func (s *syncGSuite) SyncUsers(queries []string) error {
 // References:
 // * https://developers.google.com/admin-sdk/directory/v1/guides/search-groups
 // queries possible values:
-// '' --> empty or not defined
-//  name='contact'
-//  email:admin*
-//  memberKey=user@company.com
-//  name:contact* email:contact*
-//  name:Admin* email:aws-*
-//  email:aws-*
+// ” --> empty or not defined
+//
+//	name='contact'
+//	email:admin*
+//	memberKey=user@company.com
+//	name:contact* email:contact*
+//	name:Admin* email:aws-*
+//	email:aws-*
 func (s *syncGSuite) SyncGroups(queries []string) error {
 	if len(queries) < 1 {
 		queries = append(queries, "")
@@ -289,20 +291,22 @@ func (s *syncGSuite) SyncGroups(queries []string) error {
 // References:
 // * https://developers.google.com/admin-sdk/directory/v1/guides/search-groups
 // queries possible values:
-// '' --> empty or not defined
-//  name='contact'
-//  email:admin*
-//  memberKey=user@company.com
-//  name:contact* email:contact*
-//  name:Admin* email:aws-*
-//  email:aws-*
+// ” --> empty or not defined
+//
+//	name='contact'
+//	email:admin*
+//	memberKey=user@company.com
+//	name:contact* email:contact*
+//	name:Admin* email:aws-*
+//	email:aws-*
+//
 // process workflow:
-//  1) delete users in aws, these were deleted in google
-//  2) update users in aws, these were updated in google
-//  3) add users in aws, these were added in google
-//  4) add groups in aws and add its members, these were added in google
-//  5) validate equals aws an google groups members
-//  6) delete groups in aws, these were deleted in google
+//  1. delete users in aws, these were deleted in google
+//  2. update users in aws, these were updated in google
+//  3. add users in aws, these were added in google
+//  4. add groups in aws and add its members, these were added in google
+//  5. validate equals aws an google groups members
+//  6. delete groups in aws, these were deleted in google
 func (s *syncGSuite) SyncGroupsUsers(queries []string) error {
 	if len(queries) < 1 {
 		queries = append(queries, "")
@@ -620,7 +624,7 @@ func (s *syncGSuite) getGoogleGroupsAndUsers(googleGroups []*admin.Group) ([]*ad
 			if err != nil {
 				return nil, nil, err
 			}
-			if len(u) == 0 {
+			if u == nil {
 				log.WithField("id", m.Email).Warn("missing user")
 				continue
 			}
